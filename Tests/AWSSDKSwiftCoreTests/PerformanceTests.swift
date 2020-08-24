@@ -285,7 +285,7 @@ class PerformanceTests: XCTestCase {
             do {
                 for _ in 0..<1000 {
                     let awsResponse = try AWSResponse(from: response, serviceProtocol: .restxml, raw: false)
-                    let _: StandardResponse = try awsResponse.generateOutputShape(operation: "Test")
+                    let _: StandardResponse = try awsResponse.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator())
                 }
             } catch {
                 XCTFail("\(error)")
@@ -308,7 +308,7 @@ class PerformanceTests: XCTestCase {
             do {
                 for _ in 0..<1000 {
                     let awsResponse = try AWSResponse(from: response, serviceProtocol: .restjson, raw: false)
-                    let _: StandardResponse = try awsResponse.generateOutputShape(operation: "Test")
+                    let _: StandardResponse = try awsResponse.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator())
                 }
             } catch {
                 XCTFail("\(error)")

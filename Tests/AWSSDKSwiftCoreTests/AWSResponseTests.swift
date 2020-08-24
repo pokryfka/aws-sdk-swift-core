@@ -38,14 +38,14 @@ class AWSResponseTests: XCTestCase {
         var awsXMLResponse: AWSResponse?
         var xmlResult: Output?
         XCTAssertNoThrow(awsXMLResponse = try AWSResponse(from: response, serviceProtocol: .query, raw: false))
-        XCTAssertNoThrow(xmlResult = try awsXMLResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(xmlResult = try awsXMLResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(xmlResult?.h, "test-header")
 
         // JSON
         var awsJSONResponse: AWSResponse?
         var jsonResult: Output?
         XCTAssertNoThrow(awsJSONResponse = try AWSResponse(from: response, serviceProtocol: .restjson, raw: false))
-        XCTAssertNoThrow(jsonResult = try awsJSONResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(jsonResult = try awsJSONResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(jsonResult?.h, "test-header")
     }
 
@@ -64,14 +64,14 @@ class AWSResponseTests: XCTestCase {
         var awsXMLResponse: AWSResponse?
         var xmlResult: Output?
         XCTAssertNoThrow(awsXMLResponse = try AWSResponse(from: response, serviceProtocol: .query, raw: false))
-        XCTAssertNoThrow(xmlResult = try awsXMLResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(xmlResult = try awsXMLResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(xmlResult?.status, 200)
 
         // JSON
         var awsJSONResponse: AWSResponse?
         var jsonResult: Output?
         XCTAssertNoThrow(awsJSONResponse = try AWSResponse(from: response, serviceProtocol: .restjson, raw: false))
-        XCTAssertNoThrow(jsonResult = try awsJSONResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(jsonResult = try awsJSONResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(jsonResult?.status, 200)
     }
 
@@ -91,7 +91,7 @@ class AWSResponseTests: XCTestCase {
         var awsResponse: AWSResponse?
         var output: Output?
         XCTAssertNoThrow(awsResponse = try AWSResponse(from: response, serviceProtocol: .restxml, raw: false))
-        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(output?.name, "hello")
     }
 
@@ -116,7 +116,7 @@ class AWSResponseTests: XCTestCase {
         var awsResponse: AWSResponse?
         var output: Output?
         XCTAssertNoThrow(awsResponse = try AWSResponse(from: response, serviceProtocol: .restxml, raw: false))
-        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(output?.name, "hello")
         XCTAssertEqual(output?.contentType, "application/xml")
     }
@@ -136,7 +136,7 @@ class AWSResponseTests: XCTestCase {
         var awsResponse: AWSResponse?
         var output: Output?
         XCTAssertNoThrow(awsResponse = try AWSResponse(from: response, serviceProtocol: .restxml, raw: true))
-        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(output?.body.asData(), Data("{\"name\":\"hello\"}".utf8))
     }
 
@@ -155,7 +155,7 @@ class AWSResponseTests: XCTestCase {
         var awsResponse: AWSResponse?
         var output: Output?
         XCTAssertNoThrow(awsResponse = try AWSResponse(from: response, serviceProtocol: .json(version: "1.1"), raw: false))
-        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(output?.name, "hello")
     }
 
@@ -176,7 +176,7 @@ class AWSResponseTests: XCTestCase {
         var awsResponse: AWSResponse?
         var output: Output?
         XCTAssertNoThrow(awsResponse = try AWSResponse(from: response, serviceProtocol: .json(version: "1.1"), raw: false))
-        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(output?.output2.name, "hello")
     }
 
@@ -198,7 +198,7 @@ class AWSResponseTests: XCTestCase {
         var awsResponse: AWSResponse?
         var output: Output?
         XCTAssertNoThrow(awsResponse = try AWSResponse(from: response, serviceProtocol: .json(version: "1.1"), raw: true))
-        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(output?.body.asString(), "{\"name\":\"hello\"}")
     }
 
@@ -282,7 +282,7 @@ class AWSResponseTests: XCTestCase {
         var awsResponse: AWSResponse?
         var output: Output2?
         XCTAssertNoThrow(awsResponse = try AWSResponse(from: response, serviceProtocol: .json(version: "1.1"), raw: false))
-        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test"))
+        XCTAssertNoThrow(output = try awsResponse?.generateOutputShape(operation: "Test", allocator: ByteBufferAllocator()))
         XCTAssertEqual(output?.a.count, 2)
         XCTAssertEqual(output?.d, 3.14)
         XCTAssertEqual(output?.a[1].s, "Hello2")

@@ -477,7 +477,7 @@ extension AWSClient {
         let awsResponse = try AWSResponse(from: response, serviceProtocol: serviceConfig.serviceProtocol, raw: raw)
             .applyMiddlewares(serviceConfig.middlewares + middlewares)
 
-        return try awsResponse.generateOutputShape(operation: operationName)
+        return try awsResponse.generateOutputShape(operation: operationName, allocator: serviceConfig.byteBufferAllocator)
     }
 
     /// Create error from HTTPResponse. This is only called if we received an unsuccessful http status code.

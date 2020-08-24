@@ -57,7 +57,7 @@ public struct AWSResponse {
             return
         }
 
-        guard let data = body.getData(at: body.readerIndex, length: body.readableBytes, byteTransferStrategy: .noCopy) else {
+        if body.readableBytes == 0 {
             self.body = .empty
             return
         }
@@ -66,18 +66,14 @@ public struct AWSResponse {
 
         switch serviceProtocol {
         case .json, .restjson:
-            responseBody = .json(data)
+            responseBody = .json(body)
 
-        case .restxml, .query:
-            let xmlDocument = try XML.Document(data: data)
-            if let element = xmlDocument.rootElement() {
-                responseBody = .xml(element)
-            }
-
-        case .ec2:
-            let xmlDocument = try XML.Document(data: data)
-            if let element = xmlDocument.rootElement() {
-                responseBody = .xml(element)
+        case .restxml, .query, .ec2:
+            if let xmlString = body.getString(at: body.readerIndex, length: body.readableBytes) {
+                let xmlDocument = try XML.Document(string: xmlString)
+                if let element = xmlDocument.rootElement() {
+                    responseBody = .xml(element)
+                }
             }
         }
         self.body = responseBody
@@ -94,7 +90,7 @@ public struct AWSResponse {
     }
 
     /// Generate AWSShape from AWSResponse
-    func generateOutputShape<Output: AWSDecodableShape>(operation: String) throws -> Output {
+    func generateOutputShape<Output: AWSDecodableShape>(operation: String, allocator: ByteBufferAllocator) throws -> Output {
         var payloadKey: String? = (Output.self as? AWSShapeWithPayload.Type)?._payloadPath
 
         // if response has a payload with encoding info
@@ -107,15 +103,17 @@ public struct AWSResponse {
         let decoder = DictionaryDecoder()
 
         // if required apply hypertext application language transform to body
-        let body = try getHypertextApplicationLanguageBody()
+        let body = try getHypertextApplicationLanguageBody(allocator: allocator)
 
         var outputDict: [String: Any] = [:]
         switch body {
-        case .json(let data):
-            outputDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
-            // if payload path is set then the decode will expect the payload to decode to the relevant member variable
-            if let payloadKey = payloadKey {
-                outputDict = [payloadKey: outputDict]
+        case .json(let buffer):
+            if let data = buffer.getData(at: buffer.readerIndex, length: buffer.readableBytes, byteTransferStrategy: .noCopy) {
+                outputDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] ?? [:]
+                // if payload path is set then the decode will expect the payload to decode to the relevant member variable
+                if let payloadKey = payloadKey {
+                    outputDict = [payloadKey: outputDict]
+                }
             }
 
         case .xml(let node):

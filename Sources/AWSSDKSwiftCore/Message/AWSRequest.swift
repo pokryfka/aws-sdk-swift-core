@@ -187,7 +187,7 @@ extension AWSRequest {
                         Self.verifyStream(operation: operationName, payload: awsPayload, input: shapeWithPayload)
                         body = .raw(awsPayload)
                     case let shape as AWSEncodableShape:
-                        body = .json(try shape.encodeAsJSON())
+                        body = .json(try shape.encodeAsJSON(allocator: configuration.byteBufferAllocator))
                     default:
                         preconditionFailure("Cannot add this as a payload")
                     }
@@ -197,7 +197,7 @@ extension AWSRequest {
             } else {
                 // only include the body if there are members that are output in the body.
                 if memberVariablesCount > 0 {
-                    body = .json(try input.encodeAsJSON())
+                    body = .json(try input.encodeAsJSON(allocator: configuration.byteBufferAllocator))
                 }
             }
 
